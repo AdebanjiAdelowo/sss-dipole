@@ -1,4 +1,4 @@
-# Dipole Subsurface Scattering — Donner & Jensen 2005
+# Dipole Subsurface Scattering: Donner & Jensen 2005
 
 A fully **differentiable** PyTorch implementation of the multi-layered dipole
 BSSRDF, parameterised with realistic optical properties for all six Fitzpatrick
@@ -64,7 +64,7 @@ The diffusion coefficient is `D = 1 / (3 σ'_t)`.
 ## 2. The dipole approximation
 
 Jensen et al. (2001) solve the diffusion equation for a semi-infinite medium
-by placing two point sources — the **real dipole** at depth `z_r` (where the
+by placing two point sources: the **real dipole** at depth `z_r` (where the
 refracted ray enters the medium) and a **virtual dipole** above the surface at
 `z_v` (to enforce the zero-flux boundary condition):
 
@@ -84,8 +84,8 @@ For skin `η ≈ 1.4`, giving `F_dr ≈ 0.28` and `A ≈ 1.78`.
 
 ### The dipole BSSRDF
 
-The diffuse reflectance profile — exitant flux per unit irradiance at radial
-distance `r` from the entry point — is:
+The diffuse reflectance profile (exitant flux per unit irradiance at radial
+distance `r` from the entry point) is:
 
 ```
 Rd(r) = (α' / 4π) · [ z_r (σ_tr d_r + 1) e^{−σ_tr d_r} / d_r³
@@ -139,12 +139,12 @@ Rd_total(r) = Rd_0(r) + Td_0² · Rd_1(r) / (1 − R_hemi_1 · R_hemi_0_back)
 ```
 
 where
-- `Rd_0(r)` — epidermis single-layer dipole profile
-- `Rd_1(r)` — dermis single-layer dipole profile
-- `Td_0 = exp(−σ_tr_0 · d_0)` — diffuse transmittance through epidermis
-- `Td_0²` — accounts for light passing through the epidermis **twice** (once down, once up)
-- `R_hemi_1` — hemispherical reflectance of dermis
-- `R_hemi_0_back` — hemispherical reflectance of epidermis seen from inside
+- `Rd_0(r)`: epidermis single-layer dipole profile
+- `Rd_1(r)`: dermis single-layer dipole profile
+- `Td_0 = exp(−σ_tr_0 · d_0)`: diffuse transmittance through epidermis
+- `Td_0²`: accounts for light passing through the epidermis **twice** (once down, once up)
+- `R_hemi_1`: hemispherical reflectance of dermis
+- `R_hemi_0_back`: hemispherical reflectance of epidermis seen from inside
 
 The denominator captures multiple inter-layer reflections (the **Fabry-Pérot
 effect** for diffuse light).  For typical skin values this denominator is
@@ -198,7 +198,7 @@ correlating closely with melanin content.  We parameterise each type by:
 ```
 
 The strong wavelength dependence of scattering (Rayleigh ∝ λ⁻⁴) means blue
-light scatters most — explaining why bruises appear blue and why veins look
+light scatters most, explaining why bruises appear blue and why veins look
 blue through skin even though blood is red.
 
 ### Why fair skin looks pink and dark skin looks neutral
@@ -232,8 +232,8 @@ def sigma_a_epi(self):
     return self.log_sigma_a_epi.exp()
 ```
 
-The entire BSSRDF evaluation — from optical parameters to rendered pixel
-values — is a composition of `torch.sqrt`, `torch.exp`, element-wise
+The entire BSSRDF evaluation, from optical parameters to rendered pixel
+values, is a composition of `torch.sqrt`, `torch.exp`, element-wise
 arithmetic, and `torch.trapezoid`, all of which have well-defined autograd
 gradients.
 
@@ -280,13 +280,13 @@ model, ftype = build_skin_bssrdf("III", learnable=True)
 
 # Evaluate BSSRDF profile
 r = build_r_grid(r_max=5.0, n=512)
-Rd = model(r)             # (512, 3) — R, G, B channels
+Rd = model(r)             # (512, 3): R, G, B channels
 
 # Hemispherical reflectance (total diffuse albedo)
 R_hemi = hemispherical_reflectance(Rd, r)  # (3,)
 print(R_hemi)  # tensor([0.35, 0.28, 0.12]) approx for Type III
 
-# Gradient example — differentiate R_hemi w.r.t. melanin fraction
+# Gradient example: differentiate R_hemi w.r.t. melanin fraction
 R_hemi.sum().backward()
 print(model.log_sigma_a_epi.grad)
 ```
@@ -298,11 +298,11 @@ print(model.log_sigma_a_epi.grad)
 ```
 sss-dipole/
 ├── sss/
-│   ├── dipole.py        — single-layer dipole BSSRDF (Jensen 2001)
-│   ├── multilayer.py    — multi-layer extension + SkinBSSRDF model
-│   ├── skin_params.py   — Fitzpatrick I-VI optical parameters
-│   └── renderer.py      — flat-patch renderer, hemispherical integrals
-├── plot_comparison.py   — produces the comparison figure
+│   ├── dipole.py        : single-layer dipole BSSRDF (Jensen 2001)
+│   ├── multilayer.py    : multi-layer extension + SkinBSSRDF model
+│   ├── skin_params.py   : Fitzpatrick I-VI optical parameters
+│   └── renderer.py      : flat-patch renderer, hemispherical integrals
+├── plot_comparison.py   : produces the comparison figure
 ├── requirements.txt
 └── README.md
 ```
