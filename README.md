@@ -80,7 +80,8 @@ A   = (1 + F_dr) / (1 − F_dr)
 F_dr ≈ −1.44/η² + 0.71/η + 0.668 + 0.0636 η     (Fresnel moment, Jensen 2001)
 ```
 
-For skin `η ≈ 1.4`, giving `F_dr ≈ 0.28` and `A ≈ 1.78`.
+For skin `η ≈ 1.4`, this gives `F_dr ≈ 0.53` and `A ≈ 3.25` (values from the
+polynomial fit as implemented in `sss/dipole.py::fresnel_moment1`).
 
 ### The dipole BSSRDF
 
@@ -242,7 +243,7 @@ gradients.
 To fit skin type from an RGB photograph:
 
 ```python
-model = build_skin_bssrdf("III", learnable=True)
+model, _ = build_skin_bssrdf("III", learnable=True)
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-2)
 
 for step in range(1000):
@@ -284,12 +285,18 @@ Rd = model(r)             # (512, 3): R, G, B channels
 
 # Hemispherical reflectance (total diffuse albedo)
 R_hemi = hemispherical_reflectance(Rd, r)  # (3,)
-print(R_hemi)  # tensor([0.35, 0.28, 0.12]) approx for Type III
+print(R_hemi)  # tensor([1.126, 0.745, 0.752]) measured for Type III
 
 # Gradient example: differentiate R_hemi w.r.t. melanin fraction
 R_hemi.sum().backward()
 print(model.log_sigma_a_epi.grad)
 ```
+
+Note that `R_hemi` here is the raw dipole-model integral, not a
+radiometrically normalised albedo, so components above 1 (as for the R
+channel above) do occur; `plot_comparison.py` renormalises by the 99th
+percentile across all rendered images before display, which is why the
+figure itself stays visually plausible.
 
 ---
 
