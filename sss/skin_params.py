@@ -60,7 +60,7 @@ Epidermis scattering (mm⁻¹, Mie + Rayleigh)
     R: 14.0,  G: 18.0,  B: 24.0    (g ≈ 0.79)
 
 Dermis scattering (mm⁻¹)
-    R: 18.0,  G: 22.0,  B: 28.0    (g ≈ 0.78)
+    R: 18.0,  G: 22.0,  B: 28.0    (g ≈ 0.79)
 """
 
 import torch
